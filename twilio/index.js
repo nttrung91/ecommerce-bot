@@ -1,19 +1,40 @@
-const accountSid = 'AC58de5488d06d5f52f1d577e2c87c36e5';
-const authToken = '206c0df69c5601339b277ef266b2be5f';
-const client = require('twilio')(accountSid, authToken);
+const async = require('async');
+const tasks = require('./tasks');
 
-const Twilio = () => {
-  const start = () =>
-    client.autopilot.assistants
-      .create({
-        friendlyName: 'Quickstart Assistant',
-        uniqueName: 'quickstart-assistant'
-      })
-      .then(assistant => {
-        console.log('twilio');
-        return console.log(assistant.sid);
-      })
-      .catch(err => console.log(err));
+const Twilio = (accountSid, authToken) => {
+  const client = require('twilio')(accountSid, authToken);
+
+  const createTasks = async () => {
+    return async.each(
+      tasks,
+      async function(task, cb) {
+        await client.autopilot
+          .assistants(process.env.ASSISTANT_SID)
+          .tasks.create({
+            uniqueName: task.name,
+            actions: {
+              actions: task.actions
+            }
+          })
+          .catch(e => console.log(e.message))
+          .done();
+
+        cb();
+      },
+      function(error) {
+        if (error) {
+          console.log('A file failed to process');
+        } else {
+          console.log('All files have been processed successfully');
+        }
+      }
+    );
+  };
+
+  const start = async () => {
+    // Create task
+    await createTasks();
+  };
 
   return {
     start

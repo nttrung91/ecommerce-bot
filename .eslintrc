@@ -5,7 +5,7 @@
     "plugin:import/warnings"
   ],
   "parserOptions": {
-    "ecmaVersion": 6,
+    "ecmaVersion": 2017,
     "sourceType": "module"
   },
   "env": {
@@ -14,7 +14,7 @@
   },
   "rules": {
     "quotes": 0,
-    "indent": ["error", 2, {"SwitchCase": 1}],
+    "indent": ["error", 2, { "SwitchCase": 1 }],
     "no-console": 0,
     "no-debugger": 0,
     "semi": [1, "always"],
@@ -23,9 +23,12 @@
     "no-underscore-dangle": 0,
     "no-alert": 0,
     "no-lone-blocks": 0,
-    "no-unused-vars": [1, {
-      "vars": "all",
-      "args": "after-used"
-    }]
+    "no-unused-vars": [
+      1,
+      {
+        "vars": "all",
+        "args": "after-used"
+      }
+    ]
   }
 }

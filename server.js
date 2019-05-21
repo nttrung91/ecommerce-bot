@@ -1,8 +1,12 @@
 'use strict';
 
+require('dotenv').config();
+
 const Glue = require('glue');
 const manifest = require('./config/manifest');
 const Twilio = require('./twilio');
+
+const { ACCOUNT_SID, AUTH_TOKEN } = process.env;
 
 if (!process.env.PRODUCTION) {
   manifest.registrations.push({
@@ -12,6 +16,9 @@ if (!process.env.PRODUCTION) {
     }
   });
 }
+
+const twilio = Twilio(ACCOUNT_SID, AUTH_TOKEN);
+twilio.start();
 
 // Start Hapi services
 Glue.compose(
@@ -25,10 +32,6 @@ Glue.compose(
       console.log(
         '✅  Server is listening on ' + server.info.uri.toLowerCase()
       );
-
-      // Start Twilio
-      const twilio = Twilio();
-      twilio.start();
     });
   }
 );
