@@ -1,8 +1,8 @@
 {
-  "name": "hapi-api",
+  "name": "universal-bot",
   "version": "1.0.0",
   "license": "MIT",
-  "description": "Lean Hapi API Boilerplate",
+  "description": "A bot for Grocery App",
   "bugs": {
     "url": "https://github.com/rjmreis/hapi-api/issues"
   },
