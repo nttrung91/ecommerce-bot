@@ -36,7 +36,6 @@ const createSamples = client => async samples =>
           return reject('There is an issue while creating samples.');
         }
 
-        console.log('All samples are created successfully.');
         return resolve('All samples are created successfully.');
       }
     );
