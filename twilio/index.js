@@ -4,6 +4,7 @@ const async = require('async');
 const createTasks = require('./actions/createTasks');
 const createSamples = require('./actions/createSamples');
 const setDefaultTask = require('./actions/setDefaultTask');
+const buildModel = require('./actions/buildModel');
 
 // Configs
 const tasks = require('./configs/tasks');
@@ -25,13 +26,18 @@ const Twilio = (accountSid, authToken) => {
     // } catch (e) {
     //   console.log(e);
     // }
-
     // Set default task
-    try {
-      await setDefaultTask(client)(tasks);
-    } catch (e) {
-      console.log(e);
-    }
+    // try {
+    //   await setDefaultTask(client)(tasks);
+    // } catch (e) {
+    //   console.log(e);
+    // }
+    // Build model
+    // try {
+    //   await buildModel(client)('v0.1');
+    // } catch (e) {
+    //   console.log(e);
+    // }
   };
 
   return {
