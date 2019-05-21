@@ -12,6 +12,7 @@ const tasks = [
   },
   {
     name: 'hello-world-2',
+    default: true,
     actions: [
       {
         say: 'Hi there, My name is Hieu. How can I help you today?'
