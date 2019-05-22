@@ -8,7 +8,7 @@ const manifest = require('./config/manifest');
 
 // const { ACCOUNT_SID, AUTH_TOKEN } = process.env;
 
-if (!process.env.PRODUCTION) {
+if (process.env.NODE_ENV !== 'production') {
   manifest.registrations.push({
     plugin: {
       register: 'blipp',
