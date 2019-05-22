@@ -1,5 +1,6 @@
 const envKey = key => {
-  const env = process.env.NODE_ENV || 'development';
+  const env =
+    process.env.NODE_ENV === 'production' ? 'production' : 'development';
 
   const configuration = {
     development: {
@@ -51,7 +52,13 @@ const manifest = {
           ops: { interval: 60000 },
           reporters: {
             console: [
-              { module: 'good-squeeze', name: 'Squeeze', args: [{ error: '*' }] }, { module: 'good-console' }, 'stdout'
+              {
+                module: 'good-squeeze',
+                name: 'Squeeze',
+                args: [{ error: '*' }]
+              },
+              { module: 'good-console' },
+              'stdout'
             ]
           }
         }
