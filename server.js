@@ -4,9 +4,9 @@ require('dotenv').config();
 
 const Glue = require('glue');
 const manifest = require('./config/manifest');
-const Twilio = require('./twilio');
+// const Twilio = require('./twilio');
 
-const { ACCOUNT_SID, AUTH_TOKEN } = process.env;
+// const { ACCOUNT_SID, AUTH_TOKEN } = process.env;
 
 if (!process.env.PRODUCTION) {
   manifest.registrations.push({

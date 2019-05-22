@@ -9,7 +9,8 @@
   "main": "server.js",
   "scripts": {
     "test": "./node_modules/lab/bin/lab -v",
-    "start": "npm-run-all --parallel lint start:server",
+    "start": "node server.js",
+    "start:dev": "npm-run-all --parallel lint start:server",
     "start:server": "nodemon server.js",
     "lint": "eslint . --ext .js"
   },
