@@ -17,8 +17,9 @@ if (!process.env.PRODUCTION) {
   });
 }
 
-const twilio = Twilio(ACCOUNT_SID, AUTH_TOKEN);
-twilio.start();
+// Twilio
+// const twilio = Twilio(ACCOUNT_SID, AUTH_TOKEN);
+// twilio.start();
 
 // Start Hapi services
 Glue.compose(
