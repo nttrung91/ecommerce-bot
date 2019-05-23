@@ -51,6 +51,7 @@ module.exports.placeOrder = {
     console.log(typeof request.payload);
 
     if (!is5DaysFromToday(date)) {
+      console.log('is not 5 days from today');
       return reply(Boom.badRequest('Date is invalid'));
     }
 
