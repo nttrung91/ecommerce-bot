@@ -42,7 +42,7 @@ const SLOT_FULFILLMENT_TYPES = {
 
 module.exports.placeOrder = {
   handler: async (request, reply) => {
-    const { fulfillment = DELIVERY, date } = request.payload;
+    const { fulfillment = DELIVERY, date = new Date() } = request.payload;
     const fulfillmentType = FULFILLMENT_TYPES[fulfillment];
     const slotFulfillmentType = SLOT_FULFILLMENT_TYPES[fulfillment];
     const daysFromNow = moment(date).fromNow();
