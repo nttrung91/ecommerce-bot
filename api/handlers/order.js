@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const axios = require('axios');
+const Boom = require('boom');
 
 module.exports.placeOrder = {
   handler: async (request, reply) => {
@@ -48,6 +49,10 @@ module.exports.placeOrder = {
     );
 
     const slotId = _.get(displaySlotsResponse, 'data.slots_0[0].slotId');
+
+    if (!slotId) {
+      return reply(Boom.badRequest('Slot is empty'));
+    }
 
     await axios(
       'https://super-qa.walmart.com.mx/api/rest/model/atg/commerce/order/purchase/ShippingGroupActor/selectedSlot',
