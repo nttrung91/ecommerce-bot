@@ -52,10 +52,14 @@ module.exports.login = {
       return reply(Boom.badRequest(err.message));
     }
 
-    const result = Object.assign(
+    let result = Object.assign(
       { products: normalizeResult(initiateCheckoutResponse.data.order) },
       { jsessionid: initiateCheckoutResponse.data.jsessionid }
     );
+
+    result = Object.assign(result, {
+      orderId: initiateCheckoutResponse.data.order.id
+    });
 
     return reply(result);
   },

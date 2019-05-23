@@ -18,10 +18,10 @@ const normalizeOrder = order => ({
 
 module.exports.reserveSlot = {
   handler: async (request, reply) => {
-    const { fulfillment = DELIVERY, jsessionId } = request.payload;
+    const { fulfillment = DELIVERY, jsessionid } = request.payload;
     const slotFulfillmentType =
       SLOT_FULFILLMENT_TYPES[fulfillment.toLowerCase()];
-    const cookie = `JSESSIONID_GR=${jsessionId};`;
+    const cookie = `JSESSIONID_GR=${jsessionid};`;
     let displaySlotsResponse;
 
     try {
@@ -94,8 +94,8 @@ module.exports.reserveSlot = {
 
 module.exports.placeOrder = {
   handler: async (request, reply) => {
-    const { orderId, jsessionId } = request.payload;
-    const cookie = `JSESSIONID_GR=${jsessionId};`;
+    const { orderId, jsessionid } = request.payload;
+    const cookie = `JSESSIONID_GR=${jsessionid};`;
 
     if (!orderId) {
       return reply(Boom.notAcceptable('Order is invalid'));
