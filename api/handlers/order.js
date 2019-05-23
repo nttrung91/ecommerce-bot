@@ -47,6 +47,9 @@ module.exports.placeOrder = {
     const slotFulfillmentType = SLOT_FULFILLMENT_TYPES[fulfillment];
     let jsessionId, cookie;
 
+    console.log(request.payload);
+    console.log(typeof request.payload);
+
     if (!is5DaysFromToday(date)) {
       return reply(Boom.badRequest('Date is invalid'));
     }
