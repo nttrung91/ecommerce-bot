@@ -1,20 +1,82 @@
 const _ = require('lodash');
 const Boom = require('boom');
 
-const { DELIVERY, SLOT_FULFILLMENT_TYPES } = require('./constants');
 const {
+  DELIVERY,
+  FULFILLMENT_TYPES,
+  SLOT_FULFILLMENT_TYPES
+} = require('./constants');
+const {
+  normalizeOrder,
+  normalizeProducts,
+  normalizeSlot
+} = require('./normalizr');
+const { login } = require('../gr/account');
+const {
+  initiateCheckout: initiateCheckoutApi,
   displaySlots,
   selectSlot,
   reserveSlot,
   applyPaymentType,
   placeOrder
 } = require('../gr/checkout');
-const { getActiveSlots, getEarliestActiveSlot } = require('./utils');
+const {
+  is5DaysFromToday,
+  getActiveSlots,
+  getEarliestActiveSlot
+} = require('./utils');
 
-const normalizeOrder = order => ({
-  orderId: order.id,
-  slot: _.get(order, 'shippingGroups[0].slot', {})
-});
+module.exports.initiateCheckout = {
+  handler: async (request, reply) => {
+    const { fulfillment = DELIVERY, date } = request.payload;
+    const fulfillmentType = FULFILLMENT_TYPES[fulfillment.toLowerCase()];
+    let jsessionId, cookie;
+
+    if (!is5DaysFromToday(date)) {
+      return reply(Boom.notAcceptable('Date is invalid'));
+    }
+
+    const loginResponse = await login({
+      email: 'trung3300@gmail.com',
+      password: 'abcd1234',
+      storeId: '0000003852'
+    });
+
+    jsessionId = _.get(loginResponse.data, 'jsessionid');
+    cookie = `JSESSIONID_GR=${jsessionId};`;
+
+    /* Initiate Checkout */
+    let initiateCheckoutResponse;
+
+    try {
+      initiateCheckoutResponse = await initiateCheckoutApi({
+        headers: {
+          cookie
+        },
+        data: {
+          shippingMethod: fulfillmentType
+        }
+      });
+    } catch (err) {
+      return reply(Boom.badRequest(err.message));
+    }
+
+    let result = Object.assign(
+      { products: normalizeProducts(initiateCheckoutResponse.data.order) },
+      { jsessionid: initiateCheckoutResponse.data.jsessionid }
+    );
+
+    result = Object.assign(result, {
+      order: normalizeOrder(initiateCheckoutResponse.data.order)
+    });
+
+    return reply(result);
+  },
+  payload: {
+    output: 'data',
+    parse: true
+  }
+};
 
 module.exports.reserveSlot = {
   handler: async (request, reply) => {
@@ -80,7 +142,7 @@ module.exports.reserveSlot = {
     }
 
     const result = Object.assign(
-      { order: normalizeOrder(reserveSlotResponse.data.order) },
+      { slot: normalizeSlot(reserveSlotResponse.data.order) },
       { jsessionid: reserveSlotResponse.data.jsessionid }
     );
 

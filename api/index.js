@@ -1,5 +1,4 @@
 const Home = require('./handlers/home');
-const Account = require('./handlers/account');
 const Checkout = require('./handlers/checkout');
 
 exports.register = (plugin, options, next) => {
@@ -7,7 +6,11 @@ exports.register = (plugin, options, next) => {
     { method: 'GET', path: '/', config: Home.hello },
     { method: 'GET', path: '/restricted', config: Home.restricted },
     { method: 'GET', path: '/{path*}', config: Home.notFound },
-    { method: 'POST', path: '/account/login', config: Account.login },
+    {
+      method: 'POST',
+      path: '/checkout/initiate-checkout',
+      config: Checkout.initiateCheckout
+    },
     {
       method: 'POST',
       path: '/checkout/reserve-slot',

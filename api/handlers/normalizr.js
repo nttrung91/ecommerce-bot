@@ -2,7 +2,7 @@ const _ = require('lodash');
 const { getTotalDiscountAmount, getFormattedPrice } = require('./utils');
 const paths = require('../paths');
 
-module.exports.normalizeResult = order =>
+module.exports.normalizeProducts = order =>
   _.get(order, 'commerceItems', []).map(item => ({
     sku: item.productId,
     quantity: item.quantity,
@@ -40,4 +40,8 @@ const normalizeOrderPrice = order => {
 module.exports.normalizeOrder = order => ({
   id: order.id,
   priceInfo: normalizeOrderPrice(order)
+});
+
+module.exports.normalizeSlot = order => ({
+  slot: _.get(order, 'shippingGroups[0].slot', {})
 });
