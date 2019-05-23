@@ -1,20 +1,40 @@
 const _ = require('lodash');
 const axios = require('axios');
 const Boom = require('boom');
+const moment = require('moment');
+
+const is5DaysFromToday = date =>
+  moment(date).isBetween(moment(), moment().add(5, 'days'));
 
 module.exports.placeOrder = {
   handler: async (request, reply) => {
-    const loginResponse = await axios.post(
+    const { date, time } = request.payload;
+    let jsessionId, cookie;
+
+    if (!is5DaysFromToday(date)) {
+      return reply(Boom.badRequest('Date is invalid'));
+    }
+
+    const daysFromNow = moment(date).fromNow();
+
+    const loginResponse = await axios(
       'https://super-qa.walmart.com.mx/api/rest/model/atg/userprofiling/ProfileActor/login',
       {
-        email: 'trung3300@gmail.com',
-        password: 'abcd1234',
-        storeId: '0000009999'
+        method: 'post',
+        headers: {
+          Accept: 'application/json'
+        },
+        data: {
+          email: 'trung3300@gmail.com',
+          password: 'abcd1234',
+          storeId: '0000003852'
+        },
+        withCredentials: true
       }
     );
 
-    const jsessionId = _.get(loginResponse.data, 'jsessionid');
-    const cookie = `JSESSIONID_GR=${jsessionId}`;
+    jsessionId = _.get(loginResponse.data, 'jsessionid');
+    cookie = `JSESSIONID_GR=${jsessionId};`;
 
     try {
       const initiateCheckoutResponse = await axios(
@@ -22,7 +42,7 @@ module.exports.placeOrder = {
         {
           method: 'post',
           headers: {
-            Accept: 'text/plain',
+            Accept: 'application/json',
             cookie
           },
           data: {
@@ -42,7 +62,7 @@ module.exports.placeOrder = {
         'https://super-qa.walmart.com.mx/api/rest/model/atg/commerce/order/purchase/ShippingGroupActor/displaySlots',
         {
           headers: {
-            Accept: 'text/plain',
+            Accept: 'application/json',
             cookie
           },
           params: {
@@ -58,7 +78,7 @@ module.exports.placeOrder = {
       return reply(Boom.badRequest(err.message));
     }
 
-    const slotId = _.get(displaySlotsResponse, 'data.slots_4[0].slotId');
+    const slotId = _.get(displaySlotsResponse, 'data.slots_3[0].slotId');
 
     if (!slotId) {
       return reply(Boom.badRequest('Slot is empty'));
@@ -70,7 +90,8 @@ module.exports.placeOrder = {
         {
           method: 'post',
           headers: {
-            Accept: 'text/plain',
+            Accept: 'application/json',
+            'content-type': 'application/json',
             cookie
           },
           data: {
@@ -82,8 +103,6 @@ module.exports.placeOrder = {
           withCredentials: true
         }
       );
-
-      debugger;
     } catch (err) {
       return reply(Boom.badRequest(err.message));
     }
@@ -96,7 +115,8 @@ module.exports.placeOrder = {
         {
           method: 'post',
           headers: {
-            Accept: 'text/plain',
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
             cookie
           },
           data: {
@@ -117,7 +137,7 @@ module.exports.placeOrder = {
         {
           method: 'post',
           headers: {
-            Accept: 'text/plain',
+            Accept: 'application/json',
             cookie
           },
           data: {
@@ -138,7 +158,7 @@ module.exports.placeOrder = {
         {
           method: 'post',
           headers: {
-            Accept: 'text/plain',
+            Accept: 'application/json',
             cookie
           },
           data: {
