@@ -12,7 +12,8 @@
     "start": "node server.js",
     "start:dev": "npm-run-all --parallel lint start:server",
     "start:server": "nodemon server.js",
-    "lint": "eslint . --ext .js"
+    "lint": "eslint . --ext .js",
+    "debug": "node --inspect-brk server.js"
   },
   "author": "Ricardo Reis",
   "homepage": "https://github.com/rjmreis/hapi-api#readme",

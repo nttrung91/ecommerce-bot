@@ -15,5 +15,21 @@ exports.handler = function(context, event, callback) {
           }
         ]
       });
+    })
+    .catch(response => {
+      console.log(response);
+      if (response.message === 'Slot is empty') {
+        return callback(null, {
+          actions: [
+            {
+              say: 'The slot is no longer there. Please pick a new slot'
+            },
+            {
+              redirect:
+                'https://glaucous-lapwing-1943.twil.io/place-pick-up-order'
+            }
+          ]
+        });
+      }
     });
 };
