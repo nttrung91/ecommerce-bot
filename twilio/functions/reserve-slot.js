@@ -1,5 +1,4 @@
 const axios = require('axios');
-const _ = require('lodash');
 
 exports.handler = function(context, event, callback) {
   const memory = event.Memory;
@@ -20,7 +19,7 @@ exports.handler = function(context, event, callback) {
   }
 
   if (answer === 'Yes') {
-    axios({
+    return axios({
       method: 'POST',
       url:
         'https://universal-ecommerce-bot.herokuapp.com/api/checkout/reserve-slot',
