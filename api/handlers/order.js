@@ -27,16 +27,30 @@ const getActiveSlots = raw => {
 
 const getEarliestActiveSlot = slots => _.get(slots, '[0][0]', {});
 
+const DELIVERY = 'ship';
+const PICK_UP = 'pickup';
+
+const FULFILLMENT_TYPES = {
+  [DELIVERY]: 'hardgoodShippingGroup',
+  [PICK_UP]: 'inStorePickupShippingGroup'
+};
+
+const SLOT_FULFILLMENT_TYPES = {
+  [DELIVERY]: 'StorePickup',
+  [PICK_UP]: 'Ship'
+};
+
 module.exports.placeOrder = {
   handler: async (request, reply) => {
-    const { date, time } = request.payload;
+    const { fulfillment = DELIVERY, date } = request.payload;
+    const fulfillmentType = FULFILLMENT_TYPES[fulfillment];
+    const slotFulfillmentType = SLOT_FULFILLMENT_TYPES[fulfillment];
+    const daysFromNow = moment(date).fromNow();
     let jsessionId, cookie;
 
     if (!is5DaysFromToday(date)) {
       return reply(Boom.badRequest('Date is invalid'));
     }
-
-    const daysFromNow = moment(date).fromNow();
 
     const loginResponse = await login({
       email: 'trung3300@gmail.com',
@@ -54,7 +68,7 @@ module.exports.placeOrder = {
           cookie
         },
         data: {
-          shippingMethod: 'inStorePickupShippingGroup'
+          shippingMethod: fulfillmentType
         }
       });
     } catch (err) {
@@ -69,7 +83,7 @@ module.exports.placeOrder = {
           cookie
         },
         params: {
-          deliveryType: 'StorePickup',
+          deliveryType: slotFulfillmentType,
           zipCode: '01110',
           storeId: '0000003852',
           isShippingStore: true
@@ -84,7 +98,7 @@ module.exports.placeOrder = {
     const earliestActiveSlotId = earliestActiveSlot.slotId;
 
     if (!earliestActiveSlotId) {
-      return reply(Boom.badRequest('Slot is invalid'));
+      return reply(Boom.badRequest('Slot is not available'));
     }
 
     try {
@@ -93,7 +107,7 @@ module.exports.placeOrder = {
           cookie
         },
         data: {
-          deliveryType: 'StorePickup',
+          deliveryType: slotFulfillmentType,
           selectedSlotId: earliestActiveSlotId,
           zipCode: '01110',
           storeId: '0000003852'
@@ -111,7 +125,7 @@ module.exports.placeOrder = {
           cookie
         },
         data: {
-          deliveryType: 'StorePickup'
+          deliveryType: slotFulfillmentType
         }
       });
     } catch (err) {
