@@ -37,7 +37,7 @@ module.exports.placeOrder = {
     cookie = `JSESSIONID_GR=${jsessionId};`;
 
     try {
-      const initiateCheckoutResponse = await axios(
+      await axios(
         'https://super-qa.walmart.com.mx/api/rest/model/atg/commerce/order/purchase/ShippingGroupActor/initiateCheckout',
         {
           method: 'post',
