@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const { getTotalDiscountAmount } = require('./utils');
+const { getTotalDiscountAmount, getFormattedPrice } = require('./utils');
 const paths = require('../paths');
 
 module.exports.normalizeResult = order =>
@@ -7,6 +7,7 @@ module.exports.normalizeResult = order =>
     sku: item.productId,
     quantity: item.quantity,
     name: item.productDisplayName,
+    amount: getFormattedPrice(item.priceInfo.amount),
     imageSrc: `${paths.domain}/images/product-images/img_small/${
       item.productId
     }s.jpg`

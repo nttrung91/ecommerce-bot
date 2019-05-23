@@ -13,13 +13,13 @@ exports.handler = function(context, event, callback) {
     },
     data: { fulfillment, date }
   }).then(response => {
-    const { products, orderId, jsessionid } = response.data;
+    const { products, order, jsessionid } = response.data;
 
     callback(null, {
       actions: [
         {
           remember: {
-            orderId,
+            order,
             fulfillment,
             products,
             jsessionid

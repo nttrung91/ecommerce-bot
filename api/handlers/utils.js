@@ -28,3 +28,9 @@ module.exports.getTotalDiscountAmount = coupons => {
 
   return Math.abs(totalDiscountAmount);
 };
+
+module.exports.getFormattedPrice = price => {
+  const formattedPrice = parseFloat(price).toFixed(2);
+
+  return isNaN(formattedPrice) ? `$--` : `$${formattedPrice}`;
+};

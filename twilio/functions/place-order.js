@@ -2,7 +2,8 @@ const axios = require('axios');
 
 exports.handler = function(context, event, callback) {
   const memory = event.Memory;
-  const { orderId, jsessionid } = JSON.parse(memory);
+  const { order, jsessionid } = JSON.parse(memory);
+  const orderId = order.id;
 
   axios({
     method: 'POST',
