@@ -36,8 +36,8 @@ const FULFILLMENT_TYPES = {
 };
 
 const SLOT_FULFILLMENT_TYPES = {
-  [DELIVERY]: 'StorePickup',
-  [PICK_UP]: 'Ship'
+  [DELIVERY]: 'Ship',
+  [PICK_UP]: 'StorePickup'
 };
 
 module.exports.placeOrder = {
