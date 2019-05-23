@@ -60,7 +60,7 @@ module.exports.placeOrder = {
 
     const slotId = _.get(displaySlotsResponse, 'data.slots_4[0].slotId');
 
-    if (slotId) {
+    if (!slotId) {
       return reply(Boom.badRequest('Slot is empty'));
     }
 
