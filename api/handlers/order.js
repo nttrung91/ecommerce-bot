@@ -45,12 +45,12 @@ const SLOT_FULFILLMENT_TYPES = {
 
 module.exports.placeOrder = {
   handler: async (request, reply) => {
-    const { fulfillment = DELIVERY, date = moment() } = request.payload;
+    const { fulfillment = DELIVERY, date } = request.payload;
     const fulfillmentType = FULFILLMENT_TYPES[fulfillment];
     const slotFulfillmentType = SLOT_FULFILLMENT_TYPES[fulfillment];
     let jsessionId, cookie;
 
-    console.log(date);
+    console.log(request.payload);
 
     if (!is5DaysFromToday(date)) {
       return reply(Boom.badRequest('Date is invalid'));
