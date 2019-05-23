@@ -7,11 +7,13 @@ const { initiateCheckout } = require('../gr/checkout');
 const { is5DaysFromToday } = require('./utils');
 
 const normalizeResult = order => {
-  console.log(_.get(order, 'commerceItems', []));
   return _.get(order, 'commerceItems', []).map(item => ({
     sku: item.productId,
     quantity: item.quantity,
-    name: item.productDisplayName
+    name: item.productDisplayName,
+    imageSrc: `https://super-qa.walmart.com.mx/images/product-images/img_small/${
+      item.productId
+    }s.jpg`
   }));
 };
 
