@@ -12,8 +12,11 @@ const {
   placeOrder
 } = require('../gr/checkout');
 
-const is5DaysFromToday = date =>
-  moment(date).isBetween(moment(), moment().add(5, 'days'));
+const is5DaysFromToday = date => {
+  console.log(moment(date));
+  debugger;
+  return moment(date).isBetween(moment(), moment().add(5, 'days'));
+};
 
 const getActiveSlots = raw => {
   const listOfSlots = _.filter(raw, (_, key) => Boolean(key.match(/slots_/i)));
@@ -42,11 +45,12 @@ const SLOT_FULFILLMENT_TYPES = {
 
 module.exports.placeOrder = {
   handler: async (request, reply) => {
-    const { fulfillment = DELIVERY, date = new Date() } = request.payload;
+    const { fulfillment = DELIVERY, date = moment() } = request.payload;
     const fulfillmentType = FULFILLMENT_TYPES[fulfillment];
     const slotFulfillmentType = SLOT_FULFILLMENT_TYPES[fulfillment];
-    const daysFromNow = moment(date).fromNow();
     let jsessionId, cookie;
+
+    console.log(date);
 
     if (!is5DaysFromToday(date)) {
       return reply(Boom.badRequest('Date is invalid'));
@@ -164,5 +168,9 @@ module.exports.placeOrder = {
     }
 
     return reply({ result: basketId });
+  },
+  payload: {
+    output: 'data',
+    parse: true
   }
 };
