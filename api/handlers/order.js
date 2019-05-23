@@ -1,10 +1,31 @@
 const _ = require('lodash');
-const axios = require('axios');
 const Boom = require('boom');
 const moment = require('moment');
 
+const { login } = require('../gr/account');
+const {
+  initiateCheckout,
+  displaySlots,
+  selectSlot,
+  reserveSlot,
+  applyPaymentType,
+  placeOrder
+} = require('../gr/checkout');
+
 const is5DaysFromToday = date =>
   moment(date).isBetween(moment(), moment().add(5, 'days'));
+
+const getActiveSlots = raw => {
+  const listOfSlots = _.filter(raw, (_, key) => Boolean(key.match(/slots_/i)));
+  const listOfActiveSlots = listOfSlots.map(slots =>
+    slots.filter(
+      slot => slot.isSlotAvailable && !slot.isSlotExpired && slot.isValid
+    )
+  );
+  return listOfActiveSlots;
+};
+
+const getEarliestActiveSlot = slots => _.get(slots, '[0][0]', {});
 
 module.exports.placeOrder = {
   handler: async (request, reply) => {
@@ -17,40 +38,25 @@ module.exports.placeOrder = {
 
     const daysFromNow = moment(date).fromNow();
 
-    const loginResponse = await axios(
-      'https://super-qa.walmart.com.mx/api/rest/model/atg/userprofiling/ProfileActor/login',
-      {
-        method: 'post',
-        headers: {
-          Accept: 'application/json'
-        },
-        data: {
-          email: 'trung3300@gmail.com',
-          password: 'abcd1234',
-          storeId: '0000003852'
-        },
-        withCredentials: true
-      }
-    );
+    const loginResponse = await login({
+      email: 'trung3300@gmail.com',
+      password: 'abcd1234',
+      storeId: '0000003852'
+    });
 
     jsessionId = _.get(loginResponse.data, 'jsessionid');
     cookie = `JSESSIONID_GR=${jsessionId};`;
 
+    /* Initiate Checkout */
     try {
-      await axios(
-        'https://super-qa.walmart.com.mx/api/rest/model/atg/commerce/order/purchase/ShippingGroupActor/initiateCheckout',
-        {
-          method: 'post',
-          headers: {
-            Accept: 'application/json',
-            cookie
-          },
-          data: {
-            shippingMethod: 'inStorePickupShippingGroup'
-          },
-          withCredentials: true
+      await initiateCheckout({
+        headers: {
+          cookie
+        },
+        data: {
+          shippingMethod: 'inStorePickupShippingGroup'
         }
-      );
+      });
     } catch (err) {
       return reply(Boom.badRequest(err.message));
     }
@@ -58,51 +64,41 @@ module.exports.placeOrder = {
     let displaySlotsResponse;
 
     try {
-      displaySlotsResponse = await axios.get(
-        'https://super-qa.walmart.com.mx/api/rest/model/atg/commerce/order/purchase/ShippingGroupActor/displaySlots',
-        {
-          headers: {
-            Accept: 'application/json',
-            cookie
-          },
-          params: {
-            deliveryType: 'StorePickup',
-            zipCode: '01110',
-            storeId: '0000003852',
-            isShippingStore: true
-          },
-          withCredentials: true
+      displaySlotsResponse = await displaySlots({
+        headers: {
+          cookie
+        },
+        params: {
+          deliveryType: 'StorePickup',
+          zipCode: '01110',
+          storeId: '0000003852',
+          isShippingStore: true
         }
-      );
+      });
     } catch (err) {
       return reply(Boom.badRequest(err.message));
     }
 
-    const slotId = _.get(displaySlotsResponse, 'data.slots_3[0].slotId');
+    const activeSlots = getActiveSlots(displaySlotsResponse.data);
+    const earliestActiveSlot = getEarliestActiveSlot(activeSlots);
+    const earliestActiveSlotId = earliestActiveSlot.slotId;
 
-    if (!slotId) {
-      return reply(Boom.badRequest('Slot is empty'));
+    if (!earliestActiveSlotId) {
+      return reply(Boom.badRequest('Slot is invalid'));
     }
 
     try {
-      const selectedSlot = await axios(
-        'https://super-qa.walmart.com.mx/api/rest/model/atg/commerce/order/purchase/ShippingGroupActor/selectedSlot',
-        {
-          method: 'post',
-          headers: {
-            Accept: 'application/json',
-            'content-type': 'application/json',
-            cookie
-          },
-          data: {
-            deliveryType: 'StorePickup',
-            selectedSlotId: slotId,
-            zipCode: '01110',
-            storeId: '0000003852'
-          },
-          withCredentials: true
+      await selectSlot({
+        headers: {
+          cookie
+        },
+        data: {
+          deliveryType: 'StorePickup',
+          selectedSlotId: earliestActiveSlotId,
+          zipCode: '01110',
+          storeId: '0000003852'
         }
-      );
+      });
     } catch (err) {
       return reply(Boom.badRequest(err.message));
     }
@@ -110,21 +106,14 @@ module.exports.placeOrder = {
     let reserveSlotResponse = '';
 
     try {
-      reserveSlotResponse = await axios(
-        'https://super-qa.walmart.com.mx/api/rest/model/atg/commerce/order/purchase/ShippingGroupActor/reserveDeliverySlot',
-        {
-          method: 'post',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-            cookie
-          },
-          data: {
-            deliveryType: 'StorePickup'
-          },
-          withCredentials: true
+      reserveSlotResponse = await reserveSlot({
+        headers: {
+          cookie
+        },
+        data: {
+          deliveryType: 'StorePickup'
         }
-      );
+      });
     } catch (err) {
       return reply(Boom.badRequest(err.message));
     }
@@ -132,42 +121,30 @@ module.exports.placeOrder = {
     const basketId = _.get(reserveSlotResponse, 'data.order.id');
 
     try {
-      await axios(
-        'https://super-qa.walmart.com.mx/api/rest/model/atg/commerce/order/purchase/PaymentGroupActor/applyPaymentType',
-        {
-          method: 'post',
-          headers: {
-            Accept: 'application/json',
-            cookie
-          },
-          data: {
-            basketId,
-            paymentMethod: 'onDeliveryPayment',
-            paymentMode: 'creditDebit'
-          },
-          withCredentials: true
+      await applyPaymentType({
+        headers: {
+          cookie
+        },
+        data: {
+          basketId,
+          paymentMethod: 'onDeliveryPayment',
+          paymentMode: 'creditDebit'
         }
-      );
+      });
     } catch (err) {
       return reply(Boom.badRequest(err.message));
     }
 
     try {
-      await axios(
-        'https://super-qa.walmart.com.mx/api/rest/model/atg/commerce/order/purchase/CommitOrderActor/commitOrder',
-        {
-          method: 'post',
-          headers: {
-            Accept: 'application/json',
-            cookie
-          },
-          data: {
-            basketId,
-            device: '23'
-          },
-          withCredentials: true
+      await placeOrder({
+        headers: {
+          cookie
+        },
+        data: {
+          basketId,
+          device: '23'
         }
-      );
+      });
     } catch (err) {
       return reply(Boom.badRequest(err.message));
     }
