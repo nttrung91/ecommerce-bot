@@ -26,10 +26,12 @@ const normalizeOrderPrice = order => {
   const adjustment = !!totalFinal && totalFinal - total;
 
   return {
-    subtotal: _.get(order, 'priceInfo.rawSubtotal', 0),
-    delivery: _.get(order, 'shippingGroups["0"].priceInfo.rawShipping', 0),
-    discount: totalDiscount,
-    total,
+    subtotal: getFormattedPrice(_.get(order, 'priceInfo.rawSubtotal', 0)),
+    delivery: getFormattedPrice(
+      _.get(order, 'shippingGroups["0"].priceInfo.rawShipping', 0)
+    ),
+    discount: getFormattedPrice(totalDiscount),
+    total: getFormattedPrice(total),
     adjustment,
     totalFinal
   };
