@@ -43,15 +43,12 @@ const SLOT_FULFILLMENT_TYPES = {
 module.exports.placeOrder = {
   handler: async (request, reply) => {
     const { fulfillment = DELIVERY, date } = request.payload;
-    const fulfillmentType = FULFILLMENT_TYPES[fulfillment];
-    const slotFulfillmentType = SLOT_FULFILLMENT_TYPES[fulfillment];
+    const fulfillmentType = FULFILLMENT_TYPES[fulfillment.toLowerCase()];
+    const slotFulfillmentType =
+      SLOT_FULFILLMENT_TYPES[fulfillment.toLowerCase()];
     let jsessionId, cookie;
 
-    console.log(request.payload);
-    console.log(typeof request.payload);
-
     if (!is5DaysFromToday(date)) {
-      console.log('is not 5 days from today');
       return reply(Boom.notAcceptable('Date is invalid'));
     }
 
@@ -75,7 +72,6 @@ module.exports.placeOrder = {
         }
       });
     } catch (err) {
-      console.log('1');
       return reply(Boom.badRequest(err.message));
     }
 
@@ -94,7 +90,6 @@ module.exports.placeOrder = {
         }
       });
     } catch (err) {
-      console.log('2');
       return reply(Boom.badRequest(err.message));
     }
 
@@ -103,7 +98,6 @@ module.exports.placeOrder = {
     const earliestActiveSlotId = earliestActiveSlot.slotId;
 
     if (!earliestActiveSlotId) {
-      console.log('Slot is not available');
       return reply(Boom.notAcceptable('Slot is not available'));
     }
 
@@ -120,7 +114,6 @@ module.exports.placeOrder = {
         }
       });
     } catch (err) {
-      console.log('3');
       return reply(Boom.badRequest(err.message));
     }
 
@@ -136,7 +129,6 @@ module.exports.placeOrder = {
         }
       });
     } catch (err) {
-      console.log('4');
       return reply(Boom.badRequest(err.message));
     }
 
@@ -154,7 +146,6 @@ module.exports.placeOrder = {
         }
       });
     } catch (err) {
-      console.log('5');
       return reply(Boom.badRequest(err.message));
     }
 
@@ -169,7 +160,6 @@ module.exports.placeOrder = {
         }
       });
     } catch (err) {
-      console.log('6');
       return reply(Boom.badRequest(err.message));
     }
 
