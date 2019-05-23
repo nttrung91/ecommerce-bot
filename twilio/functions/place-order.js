@@ -17,7 +17,7 @@ exports.handler = function(context, event, callback) {
     callback(null, {
       actions: [
         {
-          say: `Your order #${orderId} has been placed sucessfully. Is there anything else we could help you with?`
+          say: `Your order #${orderId} has been placed sucessfully.\nIs there anything else we could help you with?`
         },
         {
           listen: true

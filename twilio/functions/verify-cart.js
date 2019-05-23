@@ -11,7 +11,7 @@ exports.handler = function(context, event, callback) {
   callback(null, {
     actions: [
       {
-        say: `Your cart: \n\n${items}\n`
+        say: `Your cart: \n\n${items}\n----------\n`
       },
       {
         collect: {

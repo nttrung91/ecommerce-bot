@@ -32,9 +32,6 @@ exports.handler = function(context, event, callback) {
     callback(null, {
       actions: [
         {
-          say: 'Placing your order...'
-        },
-        {
           redirect: 'https://glaucous-lapwing-1943.twil.io/place-order'
         }
       ]

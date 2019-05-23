@@ -5,17 +5,7 @@ const { FULFILLMENT_TYPES, DELIVERY } = require('./constants');
 const { login } = require('../gr/account');
 const { initiateCheckout } = require('../gr/checkout');
 const { is5DaysFromToday } = require('./utils');
-
-const normalizeResult = order => {
-  return _.get(order, 'commerceItems', []).map(item => ({
-    sku: item.productId,
-    quantity: item.quantity,
-    name: item.productDisplayName,
-    imageSrc: `https://super-qa.walmart.com.mx/images/product-images/img_small/${
-      item.productId
-    }s.jpg`
-  }));
-};
+const { normalizeOrder, normalizeResult } = require('./normalizr');
 
 module.exports.login = {
   handler: async (request, reply) => {
@@ -58,7 +48,7 @@ module.exports.login = {
     );
 
     result = Object.assign(result, {
-      orderId: initiateCheckoutResponse.data.order.id
+      order: normalizeOrder(initiateCheckoutResponse.data.order)
     });
 
     return reply(result);
