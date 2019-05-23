@@ -30,20 +30,23 @@ module.exports.initiateCheckout = {
   handler: async (request, reply) => {
     const { fulfillment = DELIVERY, date } = request.payload;
     const fulfillmentType = FULFILLMENT_TYPES[fulfillment.toLowerCase()];
-    let jsessionId, cookie;
+    let jsessionid = request.payload.jsessionid;
+    let cookie;
 
     if (!is5DaysFromToday(date)) {
       return reply(Boom.notAcceptable('Date is invalid'));
     }
 
-    const loginResponse = await login({
-      email: 'trung3300@gmail.com',
-      password: 'abcd1234',
-      storeId: '0000003852'
-    });
+    if (!jsessionid) {
+      const loginResponse = await login({
+        email: 'trung3300@gmail.com',
+        password: 'abcd1234',
+        storeId: '0000003852'
+      });
+      jsessionid = _.get(loginResponse.data, 'jsessionid');
+    }
 
-    jsessionId = _.get(loginResponse.data, 'jsessionid');
-    cookie = `JSESSIONID_GR=${jsessionId};`;
+    cookie = `JSESSIONID_GR=${jsessionid};`;
 
     /* Initiate Checkout */
     let initiateCheckoutResponse;
