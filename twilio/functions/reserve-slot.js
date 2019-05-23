@@ -19,22 +19,45 @@ exports.handler = function(context, event, callback) {
     });
   }
 
-  axios({
-    method: 'POST',
-    url:
-      'https://universal-ecommerce-bot.herokuapp.com/api/checkout/reserve-slot',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json'
-    },
-    data: { jsessionid, fulfillment }
-  }).then(() => {
-    callback(null, {
-      actions: [
-        {
-          redirect: 'https://glaucous-lapwing-1943.twil.io/place-order'
-        }
-      ]
+  if (answer === 'Yes') {
+    axios({
+      method: 'POST',
+      url:
+        'https://universal-ecommerce-bot.herokuapp.com/api/checkout/reserve-slot',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      data: { jsessionid, fulfillment }
+    }).then(() => {
+      callback(null, {
+        actions: [
+          {
+            redirect: 'https://glaucous-lapwing-1943.twil.io/place-order'
+          }
+        ]
+      });
     });
+  }
+
+  return callback(null, {
+    actions: [
+      {
+        collect: {
+          name: 'Proceed to select slot',
+          questions: [
+            {
+              question:
+                '\nI am not really sure what you mean. Do you still like to proceed?',
+              name: 'proceed_to_slot',
+              type: 'Twilio.YES_NO'
+            }
+          ],
+          on_complete: {
+            redirect: 'https://glaucous-lapwing-1943.twil.io/reserve-slot'
+          }
+        }
+      }
+    ]
   });
 };
