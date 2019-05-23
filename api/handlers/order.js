@@ -52,7 +52,7 @@ module.exports.placeOrder = {
 
     if (!is5DaysFromToday(date)) {
       console.log('is not 5 days from today');
-      return reply(Boom.badRequest('Date is invalid'));
+      return reply(Boom.notAcceptable('Date is invalid'));
     }
 
     const loginResponse = await login({
@@ -75,6 +75,7 @@ module.exports.placeOrder = {
         }
       });
     } catch (err) {
+      console.log('1');
       return reply(Boom.badRequest(err.message));
     }
 
@@ -93,6 +94,7 @@ module.exports.placeOrder = {
         }
       });
     } catch (err) {
+      console.log('2');
       return reply(Boom.badRequest(err.message));
     }
 
@@ -101,7 +103,8 @@ module.exports.placeOrder = {
     const earliestActiveSlotId = earliestActiveSlot.slotId;
 
     if (!earliestActiveSlotId) {
-      return reply(Boom.badRequest('Slot is not available'));
+      console.log('Slot is not available');
+      return reply(Boom.notAcceptable('Slot is not available'));
     }
 
     try {
@@ -117,6 +120,7 @@ module.exports.placeOrder = {
         }
       });
     } catch (err) {
+      console.log('3');
       return reply(Boom.badRequest(err.message));
     }
 
@@ -132,6 +136,7 @@ module.exports.placeOrder = {
         }
       });
     } catch (err) {
+      console.log('4');
       return reply(Boom.badRequest(err.message));
     }
 
@@ -149,6 +154,7 @@ module.exports.placeOrder = {
         }
       });
     } catch (err) {
+      console.log('5');
       return reply(Boom.badRequest(err.message));
     }
 
@@ -163,6 +169,7 @@ module.exports.placeOrder = {
         }
       });
     } catch (err) {
+      console.log('6');
       return reply(Boom.badRequest(err.message));
     }
 
