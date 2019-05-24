@@ -22,7 +22,7 @@ exports.handler = function(context, event, callback) {
         say: `Your cart: \n\n${items}\n----------\n${priceSummary}\n.\n.\n`
       },
       {
-        redirect: 'https://glaucous-lapwing-1943.twil.io/ask-what-else'
+        redirect: 'https://glaucous-lapwing-1943.twil.io/hint-checkout'
       }
     ]
   });

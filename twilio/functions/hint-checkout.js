@@ -2,7 +2,8 @@ exports.handler = function(context, event, callback) {
   callback(null, {
     actions: [
       {
-        say: 'What else could we help you with today?'
+        say:
+          'How would you like to proceed?\nYou can say things like\n• pickup tomorrow\n• deliver today\nand we will set you up with the earliest available slot'
       },
       {
         listen: {

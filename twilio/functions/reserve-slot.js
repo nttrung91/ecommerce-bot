@@ -1,9 +1,14 @@
 const axios = require('axios');
+const _ = require('lodash');
 
 exports.handler = function(context, event, callback) {
   const memory = event.Memory;
-  const answer = event.CurrentInput;
-  const { fulfillment, jsessionid } = JSON.parse(memory);
+  const { fulfillment, jsessionid, twilio } = JSON.parse(memory);
+  const answer = _.get(
+    twilio,
+    'collected_data.proceed_next_step_question.answers.proceed_next_step.answer',
+    ''
+  );
 
   if (answer === 'No') {
     return callback(null, {
@@ -43,12 +48,12 @@ exports.handler = function(context, event, callback) {
     actions: [
       {
         collect: {
-          name: 'Proceed to select slot',
+          name: 'proceed_next_step_question',
           questions: [
             {
               question:
-                '\nI am not really sure what you mean. Do you still like to proceed?',
-              name: 'proceed_to_slot',
+                '\nI am not sure what you mean. Do you want to proceed?',
+              name: 'proceed_next_step',
               type: 'Twilio.YES_NO'
             }
           ],

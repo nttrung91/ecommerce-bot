@@ -23,11 +23,12 @@ exports.handler = function(context, event, callback) {
       },
       {
         collect: {
-          name: 'Proceed to select slot',
+          name: 'proceed_next_step_question',
           questions: [
             {
-              question: '\nWould you like to proceed?',
-              name: 'proceed_to_slot',
+              question:
+                '\nGreat, we saved your preference. Would you like to place this order?',
+              name: 'proceed_next_step',
               type: 'Twilio.YES_NO'
             }
           ],
