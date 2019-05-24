@@ -6,7 +6,7 @@ const {
   getSpecialList,
   addSpecialItems: addSpecialItemsApi
 } = require('../gr/cart');
-const { normalizeProducts } = require('./normalizr');
+const { normalizeOrder, normalizeProducts } = require('./normalizr');
 
 module.exports.addSpecialItems = {
   handler: async (request, reply) => {
@@ -71,12 +71,16 @@ module.exports.addSpecialItems = {
       return reply(Boom.badRequest(err.message));
     }
 
-    const result = Object.assign(
+    let result = Object.assign(
       {
         products: normalizeProducts(addSpecialItemsResponse.data.order)
       },
       { jsessionid }
     );
+
+    result = Object.assign(result, {
+      order: normalizeOrder(addSpecialItemsResponse.data.order)
+    });
 
     return reply(result);
   }
