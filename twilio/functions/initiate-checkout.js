@@ -6,7 +6,8 @@ exports.handler = function(context, event, callback) {
 
   axios({
     method: 'POST',
-    url: 'https://universal-ecommerce-bot.herokuapp.com/api/account/login',
+    url:
+      'https://universal-ecommerce-bot.herokuapp.com/api/checkout/initiate-checkout',
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json'

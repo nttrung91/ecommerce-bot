@@ -1,5 +1,6 @@
 const Home = require('./handlers/home');
 const Checkout = require('./handlers/checkout');
+const Cart = require('./handlers/cart');
 
 exports.register = (plugin, options, next) => {
   plugin.route([
@@ -20,6 +21,11 @@ exports.register = (plugin, options, next) => {
       method: 'POST',
       path: '/checkout/place-order',
       config: Checkout.placeOrder
+    },
+    {
+      method: 'POST',
+      path: '/cart/add-special-items',
+      config: Cart.addSpecialItems
     }
   ]);
 
