@@ -3,20 +3,21 @@ const _ = require('lodash');
 exports.handler = function(context, event, callback) {
   const memory = event.Memory;
   const { orders } = JSON.parse(memory);
-  const openOrders = orders.filter(order =>
-    _.includes(order.state, ['ORDER_DELIVERED'])
+  const openOrders = orders.filter(
+    order => !_.includes(order.state, ['ORDER_DELIVERED'])
   );
   let result = _.join(
-    openOrders.map(
-      ({ id, date, status }) => `Order#${id}\nDate: ${date}\nStatus: ${status}`
+    _.take(openOrders, 5).map(
+      ({ id, date, status }) =>
+        `\nOrder#${id}\nDate: ${date}\nStatus: ${status}\n`
     ),
-    '\n'
+    '---'
   );
 
   callback(null, {
     actions: [
       {
-        say: result
+        say: `${result}\n.`
       },
       {
         redirect: 'https://glaucous-lapwing-1943.twil.io/ask-what-else'
