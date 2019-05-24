@@ -71,6 +71,8 @@ module.exports.addSpecialItems = {
       return reply(Boom.badRequest(err.message));
     }
 
-    return reply(normalizeProducts(addSpecialItemsResponse.data.order));
+    return reply({
+      products: normalizeProducts(addSpecialItemsResponse.data.order)
+    });
   }
 };
