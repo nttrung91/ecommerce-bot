@@ -10,18 +10,19 @@ exports.handler = function(context, event, callback) {
       'Content-Type': 'application/json'
     }
   }).then(response => {
-    const { products, jsessionid } = response.data;
+    const { products, order, jsessionid } = response.data;
 
     callback(null, {
       actions: [
         {
           remember: {
             products,
+            order,
             jsessionid
           }
         },
         {
-          redirect: 'task://ask-what-else'
+          redirect: 'https://glaucous-lapwing-1943.twil.io/show-cart'
         }
       ]
     });
