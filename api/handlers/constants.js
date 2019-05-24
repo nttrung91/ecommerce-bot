@@ -13,3 +13,11 @@ module.exports.SLOT_FULFILLMENT_TYPES = {
   [delivery]: 'Ship',
   [pickup]: 'StorePickup'
 };
+
+module.exports.ORDER_STATUS = {
+  SENT_TO_STORE: 'Enviado a Tienda',
+  PACK_COMPLETE: 'Listo para entregar',
+  ORDER_DELIVERED: 'Entregado',
+  ORDER_CANCELLED: 'Cancelado',
+  SENT_TO_FULFILLMENT: 'Enviado a Tienda'
+};

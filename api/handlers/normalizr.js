@@ -1,4 +1,6 @@
 const _ = require('lodash');
+
+const { ORDER_STATUS } = require('./constants');
 const { getTotalDiscountAmount, getFormattedPrice } = require('./utils');
 const paths = require('../paths');
 
@@ -45,3 +47,10 @@ module.exports.normalizeOrder = order => ({
 module.exports.normalizeSlot = order => ({
   slot: _.get(order, 'shippingGroups[0].slot', {})
 });
+
+module.exports.normalizeOrders = orders =>
+  orders.map(order => ({
+    id: order.id,
+    date: order.submittedDate.formattedDate,
+    status: ORDER_STATUS[order.state]
+  }));

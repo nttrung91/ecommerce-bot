@@ -14,3 +14,22 @@ module.exports.login = ({ email, password, storeId }) =>
     },
     withCredentials: true
   });
+
+module.exports.getOrders = ({ headers }) =>
+  axios(
+    `${
+      paths.domain
+    }/api/rest/model/atg/userprofiling/ProfileActor/customOrderLookUp`,
+    {
+      method: 'get',
+      headers: Object.assign(
+        {
+          Accept: 'application/json',
+          pragma: 'no-cache'
+        },
+        headers
+      ),
+
+      withCredentials: true
+    }
+  );
