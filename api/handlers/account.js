@@ -2,7 +2,11 @@ const _ = require('lodash');
 const Boom = require('boom');
 
 const { login, getOrders } = require('../gr/account');
-const { normalizeOrders, normalizeProducts } = require('./normalizr');
+const {
+  normalizeOrder,
+  normalizeOrders,
+  normalizeProducts
+} = require('./normalizr');
 
 module.exports.login = {
   handler: async (request, reply) => {
@@ -16,7 +20,7 @@ module.exports.login = {
 
     const result = Object.assign(
       {
-        order,
+        order: normalizeOrder(order),
         products: normalizeProducts(order)
       },
       { jsessionid }

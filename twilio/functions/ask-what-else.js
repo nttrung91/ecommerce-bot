@@ -7,6 +7,7 @@ exports.handler = function(context, event, callback) {
       {
         listen: {
           tasks: [
+            'view-cart',
             'track-recent-order',
             'track-open-orders',
             'place-pick-up-order',
