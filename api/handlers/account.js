@@ -31,9 +31,12 @@ module.exports.getOrders = {
       return reply(Boom.badRequest(err.message));
     }
 
-    const result = {
-      orders: normalizeOrders(getOrdersResponse.data.orderMap)
-    };
+    const result = Object.assign(
+      {
+        orders: normalizeOrders(getOrdersResponse.data.orderMap)
+      },
+      { jsessionid }
+    );
 
     return reply(result);
   }

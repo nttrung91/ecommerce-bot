@@ -52,5 +52,6 @@ module.exports.normalizeOrders = orders =>
   orders.map(order => ({
     id: order.id,
     date: order.submittedDate.formattedDate,
+    state: order.state,
     status: ORDER_STATUS[order.state]
   }));
