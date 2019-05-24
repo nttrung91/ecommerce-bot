@@ -32,6 +32,11 @@ exports.register = (plugin, options, next) => {
       method: 'GET',
       path: '/account/orders',
       config: Account.getOrders
+    },
+    {
+      method: 'POST',
+      path: '/account/login',
+      config: Account.login
     }
   ]);
 

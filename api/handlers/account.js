@@ -2,7 +2,29 @@ const _ = require('lodash');
 const Boom = require('boom');
 
 const { login, getOrders } = require('../gr/account');
-const { normalizeOrders } = require('./normalizr');
+const { normalizeOrders, normalizeProducts } = require('./normalizr');
+
+module.exports.login = {
+  handler: async (request, reply) => {
+    const loginResponse = await login({
+      email: 'trung3300@gmail.com',
+      password: 'abcd1234',
+      storeId: '0000003852'
+    });
+    const jsessionid = _.get(loginResponse.data, 'jsessionid');
+    const order = _.get(loginResponse, 'data.addedItemDetails.order');
+
+    const result = Object.assign(
+      {
+        order,
+        products: normalizeProducts(order)
+      },
+      { jsessionid }
+    );
+
+    return reply(result);
+  }
+};
 
 module.exports.getOrders = {
   handler: async (request, reply) => {
