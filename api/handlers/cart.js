@@ -71,8 +71,13 @@ module.exports.addSpecialItems = {
       return reply(Boom.badRequest(err.message));
     }
 
-    return reply({
-      products: normalizeProducts(addSpecialItemsResponse.data.order)
-    });
+    const result = Object.assign(
+      {
+        products: normalizeProducts(addSpecialItemsResponse.data.order)
+      },
+      { jsessionid }
+    );
+
+    return reply(result);
   }
 };
