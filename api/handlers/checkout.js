@@ -1,69 +1,58 @@
 const _ = require('lodash');
 const Boom = require('boom');
-const moment = require('moment');
 
+const {
+  DELIVERY,
+  FULFILLMENT_TYPES,
+  SLOT_FULFILLMENT_TYPES
+} = require('./constants');
+const {
+  normalizeOrder,
+  normalizeProducts,
+  normalizeSlot
+} = require('./normalizr');
 const { login } = require('../gr/account');
 const {
-  initiateCheckout,
+  initiateCheckout: initiateCheckoutApi,
   displaySlots,
   selectSlot,
   reserveSlot,
   applyPaymentType,
   placeOrder
 } = require('../gr/checkout');
+const {
+  is5DaysFromToday,
+  getActiveSlots,
+  getEarliestActiveSlot
+} = require('./utils');
 
-const is5DaysFromToday = date =>
-  moment(date).isBetween(moment(), moment().add(5, 'days'));
-
-const getActiveSlots = raw => {
-  const listOfSlots = _.filter(raw, (_, key) => Boolean(key.match(/slots_/i)));
-  const listOfActiveSlots = listOfSlots.map(slots =>
-    slots.filter(
-      slot => slot.isSlotAvailable && !slot.isSlotExpired && slot.isValid
-    )
-  );
-  return listOfActiveSlots;
-};
-
-const getEarliestActiveSlot = slots => _.get(slots, '[0][0]', {});
-
-const DELIVERY = 'ship';
-const PICK_UP = 'pickup';
-
-const FULFILLMENT_TYPES = {
-  [DELIVERY]: 'hardgoodShippingGroup',
-  [PICK_UP]: 'inStorePickupShippingGroup'
-};
-
-const SLOT_FULFILLMENT_TYPES = {
-  [DELIVERY]: 'Ship',
-  [PICK_UP]: 'StorePickup'
-};
-
-module.exports.placeOrder = {
+module.exports.initiateCheckout = {
   handler: async (request, reply) => {
     const { fulfillment = DELIVERY, date } = request.payload;
     const fulfillmentType = FULFILLMENT_TYPES[fulfillment.toLowerCase()];
-    const slotFulfillmentType =
-      SLOT_FULFILLMENT_TYPES[fulfillment.toLowerCase()];
-    let jsessionId, cookie;
+    let jsessionid = request.payload.jsessionid;
+    let cookie;
 
     if (!is5DaysFromToday(date)) {
       return reply(Boom.notAcceptable('Date is invalid'));
     }
 
-    const loginResponse = await login({
-      email: 'trung3300@gmail.com',
-      password: 'abcd1234',
-      storeId: '0000003852'
-    });
+    if (!jsessionid) {
+      const loginResponse = await login({
+        email: 'trung3300@gmail.com',
+        password: 'abcd1234',
+        storeId: '0000003852'
+      });
+      jsessionid = _.get(loginResponse.data, 'jsessionid');
+    }
 
-    jsessionId = _.get(loginResponse.data, 'jsessionid');
-    cookie = `JSESSIONID_GR=${jsessionId};`;
+    cookie = `JSESSIONID_GR=${jsessionid};`;
 
     /* Initiate Checkout */
+    let initiateCheckoutResponse;
+
     try {
-      await initiateCheckout({
+      initiateCheckoutResponse = await initiateCheckoutApi({
         headers: {
           cookie
         },
@@ -75,6 +64,29 @@ module.exports.placeOrder = {
       return reply(Boom.badRequest(err.message));
     }
 
+    let result = Object.assign(
+      { products: normalizeProducts(initiateCheckoutResponse.data.order) },
+      { jsessionid: initiateCheckoutResponse.data.jsessionid }
+    );
+
+    result = Object.assign(result, {
+      order: normalizeOrder(initiateCheckoutResponse.data.order)
+    });
+
+    return reply(result);
+  },
+  payload: {
+    output: 'data',
+    parse: true
+  }
+};
+
+module.exports.reserveSlot = {
+  handler: async (request, reply) => {
+    const { fulfillment = DELIVERY, jsessionid } = request.payload;
+    const slotFulfillmentType =
+      SLOT_FULFILLMENT_TYPES[fulfillment.toLowerCase()];
+    const cookie = `JSESSIONID_GR=${jsessionid};`;
     let displaySlotsResponse;
 
     try {
@@ -132,7 +144,27 @@ module.exports.placeOrder = {
       return reply(Boom.badRequest(err.message));
     }
 
-    const basketId = _.get(reserveSlotResponse, 'data.order.id');
+    const result = Object.assign(
+      { slot: normalizeSlot(reserveSlotResponse.data.order) },
+      { jsessionid: reserveSlotResponse.data.jsessionid }
+    );
+
+    return reply(result);
+  },
+  payload: {
+    output: 'data',
+    parse: true
+  }
+};
+
+module.exports.placeOrder = {
+  handler: async (request, reply) => {
+    const { orderId, jsessionid } = request.payload;
+    const cookie = `JSESSIONID_GR=${jsessionid};`;
+
+    if (!orderId) {
+      return reply(Boom.notAcceptable('Order is invalid'));
+    }
 
     try {
       await applyPaymentType({
@@ -140,7 +172,7 @@ module.exports.placeOrder = {
           cookie
         },
         data: {
-          basketId,
+          basketId: orderId,
           paymentMethod: 'onDeliveryPayment',
           paymentMode: 'creditDebit'
         }
@@ -155,7 +187,7 @@ module.exports.placeOrder = {
           cookie
         },
         data: {
-          basketId,
+          basketId: orderId,
           device: '23'
         }
       });
@@ -163,7 +195,7 @@ module.exports.placeOrder = {
       return reply(Boom.badRequest(err.message));
     }
 
-    return reply({ result: basketId });
+    return reply({ result: orderId });
   },
   payload: {
     output: 'data',
