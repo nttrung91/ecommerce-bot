@@ -12,6 +12,7 @@ exports.handler = function(context, event, callback) {
             'track-recent-order',
             'track-open-orders',
             'place-pick-up-order',
+            'place-delivery-order',
             'add-special-items'
           ]
         }

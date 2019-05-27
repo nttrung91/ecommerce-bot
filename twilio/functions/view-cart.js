@@ -11,6 +11,20 @@ exports.handler = function(context, event, callback) {
   }).then(response => {
     const { products, order, jsessionid } = response.data;
 
+    if (products.length === 0) {
+      return callback(null, {
+        actions: [
+          {
+            say:
+              "Your cart is currently empty. To build cart, you can say things like 'Build my basket'"
+          },
+          {
+            redirect: 'https://glaucous-lapwing-1943.twil.io/ask-what-else'
+          }
+        ]
+      });
+    }
+
     callback(null, {
       actions: [
         {
