@@ -2,7 +2,7 @@ const axios = require('axios');
 
 exports.handler = function(context, event, callback) {
   const memory = event.Memory;
-  const { order, jsessionid } = JSON.parse(memory);
+  const { order, jsessionid, auth } = JSON.parse(memory);
   const orderId = order.id;
 
   axios({
@@ -13,7 +13,7 @@ exports.handler = function(context, event, callback) {
       Accept: 'application/json',
       'Content-Type': 'application/json'
     },
-    data: { orderId, jsessionid }
+    data: { orderId, jsessionid, auth }
   }).then(() => {
     callback(null, {
       actions: [

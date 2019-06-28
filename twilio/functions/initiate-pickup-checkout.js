@@ -15,7 +15,7 @@ exports.handler = function(context, event, callback) {
     data: { fulfillment, date }
   })
     .then(response => {
-      const { products, order, jsessionid } = response.data;
+      const { products, order, jsessionid, auth } = response.data;
 
       if (products.length === 0) {
         return callback(null, {
@@ -38,7 +38,8 @@ exports.handler = function(context, event, callback) {
               order,
               fulfillment,
               products,
-              jsessionid
+              jsessionid,
+              auth
             }
           },
           {

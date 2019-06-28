@@ -10,7 +10,7 @@ exports.handler = function(context, event, callback) {
       'Content-Type': 'application/json'
     }
   }).then(response => {
-    const { products, order, jsessionid } = response.data;
+    const { products, order, jsessionid, auth } = response.data;
 
     callback(null, {
       actions: [
@@ -18,7 +18,8 @@ exports.handler = function(context, event, callback) {
           remember: {
             products,
             order,
-            jsessionid
+            jsessionid,
+            auth
           }
         },
         {

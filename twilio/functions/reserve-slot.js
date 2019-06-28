@@ -3,7 +3,7 @@ const _ = require('lodash');
 
 exports.handler = function(context, event, callback) {
   const memory = event.Memory;
-  const { fulfillment, jsessionid, twilio } = JSON.parse(memory);
+  const { fulfillment, jsessionid, twilio, auth } = JSON.parse(memory);
   const answer = _.get(
     twilio,
     'collected_data.proceed_next_step_question.answers.proceed_next_step.answer',
@@ -32,7 +32,7 @@ exports.handler = function(context, event, callback) {
         Accept: 'application/json',
         'Content-Type': 'application/json'
       },
-      data: { jsessionid, fulfillment }
+      data: { jsessionid, fulfillment, auth }
     }).then(() => {
       callback(null, {
         actions: [

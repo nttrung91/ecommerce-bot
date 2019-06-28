@@ -4,14 +4,15 @@ exports.handler = function(context, event, callback) {
   axios
     .get('https://universal-ecommerce-bot.herokuapp.com/api/account/orders')
     .then(response => {
-      const { orders, jsessionid } = response.data;
+      const { orders, jsessionid, auth } = response.data;
 
       callback(null, {
         actions: [
           {
             remember: {
               orders,
-              jsessionid
+              jsessionid,
+              auth
             }
           },
           {

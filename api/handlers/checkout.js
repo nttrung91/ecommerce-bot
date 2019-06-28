@@ -39,7 +39,7 @@ module.exports.initiateCheckout = {
       return reply(Boom.notAcceptable('Date is invalid'));
     }
 
-    if (!jsessionid) {
+    if (!jsessionid && !auth) {
       const loginResponse = await login({
         email: accountConfig.credential.username,
         password: accountConfig.credential.password,
@@ -71,7 +71,7 @@ module.exports.initiateCheckout = {
 
     let result = Object.assign(
       { products: normalizeProducts(initiateCheckoutResponse.data.order) },
-      { jsessionid: initiateCheckoutResponse.data.jsessionid }
+      { jsessionid, auth }
     );
 
     result = Object.assign(result, {
