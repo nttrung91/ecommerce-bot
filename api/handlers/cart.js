@@ -1,11 +1,9 @@
 const _ = require('lodash');
 const Boom = require('boom');
 
+const { accountConfig } = require('../config');
 const { login } = require('../gr/account');
-const {
-  getSpecialList,
-  addSpecialItems: addSpecialItemsApi
-} = require('../gr/cart');
+const { addSpecialItems: addSpecialItemsApi } = require('../gr/cart');
 const { normalizeOrder, normalizeProducts } = require('./normalizr');
 
 module.exports.addSpecialItems = {
@@ -15,8 +13,8 @@ module.exports.addSpecialItems = {
 
     if (!jsessionid) {
       const loginResponse = await login({
-        email: 'trung3300@gmail.com',
-        password: 'abcd1234',
+        email: accountConfig.credential.username,
+        password: accountConfig.credential.password,
         storeId: '0000003852'
       });
       jsessionid = _.get(loginResponse.data, 'jsessionid');

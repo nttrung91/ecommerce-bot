@@ -6,6 +6,7 @@ const {
   FULFILLMENT_TYPES,
   SLOT_FULFILLMENT_TYPES
 } = require('./constants');
+const { accountConfig } = require('../config');
 const {
   normalizeOrder,
   normalizeProducts,
@@ -39,8 +40,8 @@ module.exports.initiateCheckout = {
 
     if (!jsessionid) {
       const loginResponse = await login({
-        email: 'trung3300@gmail.com',
-        password: 'abcd1234',
+        email: accountConfig.credential.username,
+        password: accountConfig.credential.password,
         storeId: '0000003852'
       });
       jsessionid = _.get(loginResponse.data, 'jsessionid');
