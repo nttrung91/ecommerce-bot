@@ -39,7 +39,7 @@ const normalizeOrderPrice = order => {
   };
 };
 
-module.exports.normalizeOrder = order => ({
+module.exports.normalizeOrder = (order = {}) => ({
   id: order.id,
   priceInfo: normalizeOrderPrice(order)
 });

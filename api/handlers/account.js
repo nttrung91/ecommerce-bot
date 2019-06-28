@@ -17,6 +17,7 @@ module.exports.login = {
       storeId: '0000003852'
     });
     const jsessionid = _.get(loginResponse.data, 'jsessionid');
+    const auth = _.get(loginResponse.headers, 'wm_sec.refresh_auth_token');
     const order = _.get(loginResponse, 'data.addedItemDetails.order');
 
     const result = Object.assign(
@@ -24,7 +25,7 @@ module.exports.login = {
         order: order ? normalizeOrder(order) : {},
         products: normalizeProducts(order)
       },
-      { jsessionid }
+      { jsessionid, auth }
     );
 
     return reply(result);
@@ -34,6 +35,7 @@ module.exports.login = {
 module.exports.getOrders = {
   handler: async (request, reply) => {
     let jsessionid = (request.payload || {}).jsessionid;
+    let auth = (request.payload || {}).auth;
     let cookie;
     let getOrdersResponse;
 
@@ -44,9 +46,12 @@ module.exports.getOrders = {
         storeId: '0000003852'
       });
       jsessionid = _.get(loginResponse.data, 'jsessionid');
+      auth = _.get(loginResponse.headers, 'wm_sec.refresh_auth_token');
     }
 
-    cookie = `JSESSIONID_GR=${jsessionid};`;
+    cookie = `JSESSIONID_GR=${jsessionid};auth=${encodeURIComponent(
+      auth
+    )};loggedInUserCookie=loggedIn;`;
 
     try {
       getOrdersResponse = await getOrders({

@@ -9,18 +9,22 @@ const { normalizeOrder, normalizeProducts } = require('./normalizr');
 module.exports.addSpecialItems = {
   handler: async (request, reply) => {
     let jsessionid = (request.payload || {}).jsessionid;
+    let auth = (request.payload || {}).auth;
     let cookie;
 
-    if (!jsessionid) {
+    if (!jsessionid && !auth) {
       const loginResponse = await login({
         email: accountConfig.credential.username,
         password: accountConfig.credential.password,
         storeId: '0000003852'
       });
       jsessionid = _.get(loginResponse.data, 'jsessionid');
+      auth = _.get(loginResponse.headers, 'wm_sec.refresh_auth_token');
     }
 
-    cookie = `JSESSIONID_GR=${jsessionid};`;
+    cookie = `JSESSIONID_GR=${jsessionid};auth=${encodeURIComponent(
+      auth
+    )};loggedInUserCookie=loggedIn;`;
 
     // let getSpecialListResponse;
     // try {
@@ -38,14 +42,6 @@ module.exports.addSpecialItems = {
         data: {
           items: [
             {
-              productId: '00750105590027',
-              catalogRefId: '00750105590027',
-              quantity: 1,
-              orderedUom: 'EA',
-              orderedQtyWeight: 0,
-              storeId: '0000003852'
-            },
-            {
               productId: '00807680953135',
               catalogRefId: '00807680953135',
               quantity: 1,
@@ -62,7 +58,7 @@ module.exports.addSpecialItems = {
               storeId: '0000003852'
             }
           ],
-          addItemCount: 3
+          addItemCount: 2
         }
       });
     } catch (err) {

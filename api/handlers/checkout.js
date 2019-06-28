@@ -31,7 +31,8 @@ module.exports.initiateCheckout = {
   handler: async (request, reply) => {
     const { fulfillment = DELIVERY, date } = request.payload;
     const fulfillmentType = FULFILLMENT_TYPES[fulfillment.toLowerCase()];
-    let jsessionid = request.payload.jsessionid;
+    let jsessionid = (request.payload || {}).jsessionid;
+    let auth = (request.payload || {}).auth;
     let cookie;
 
     if (!is5DaysFromToday(date)) {
@@ -45,9 +46,12 @@ module.exports.initiateCheckout = {
         storeId: '0000003852'
       });
       jsessionid = _.get(loginResponse.data, 'jsessionid');
+      auth = _.get(loginResponse.headers, 'wm_sec.refresh_auth_token');
     }
 
-    cookie = `JSESSIONID_GR=${jsessionid};`;
+    cookie = `JSESSIONID_GR=${jsessionid};auth=${encodeURIComponent(
+      auth
+    )};loggedInUserCookie=loggedIn;`;
 
     /* Initiate Checkout */
     let initiateCheckoutResponse;
@@ -84,10 +88,14 @@ module.exports.initiateCheckout = {
 
 module.exports.reserveSlot = {
   handler: async (request, reply) => {
-    const { fulfillment = DELIVERY, jsessionid } = request.payload;
+    const { fulfillment = DELIVERY } = request.payload;
     const slotFulfillmentType =
       SLOT_FULFILLMENT_TYPES[fulfillment.toLowerCase()];
-    const cookie = `JSESSIONID_GR=${jsessionid};`;
+    let jsessionid = (request.payload || {}).jsessionid;
+    let auth = (request.payload || {}).auth;
+    let cookie = `JSESSIONID_GR=${jsessionid};auth=${encodeURIComponent(
+      auth
+    )};loggedInUserCookie=loggedIn;`;
     let displaySlotsResponse;
 
     try {
@@ -160,8 +168,12 @@ module.exports.reserveSlot = {
 
 module.exports.placeOrder = {
   handler: async (request, reply) => {
-    const { orderId, jsessionid } = request.payload;
-    const cookie = `JSESSIONID_GR=${jsessionid};`;
+    const { orderId } = request.payload;
+    let jsessionid = (request.payload || {}).jsessionid;
+    let auth = (request.payload || {}).auth;
+    let cookie = `JSESSIONID_GR=${jsessionid};auth=${encodeURIComponent(
+      auth
+    )};loggedInUserCookie=loggedIn;`;
 
     if (!orderId) {
       return reply(Boom.notAcceptable('Order is invalid'));
