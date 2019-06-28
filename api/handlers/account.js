@@ -39,7 +39,7 @@ module.exports.getOrders = {
     let cookie;
     let getOrdersResponse;
 
-    if (!jsessionid) {
+    if (!jsessionid && !auth) {
       const loginResponse = await login({
         email: accountConfig.credential.username,
         password: accountConfig.credential.password,
@@ -67,7 +67,7 @@ module.exports.getOrders = {
       {
         orders: normalizeOrders(getOrdersResponse.data.orderMap)
       },
-      { jsessionid }
+      { jsessionid, auth }
     );
 
     return reply(result);
