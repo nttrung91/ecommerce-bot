@@ -118,6 +118,8 @@ module.exports.reserveSlot = {
     const earliestActiveSlot = getEarliestActiveSlot(activeSlots);
     const earliestActiveSlotId = earliestActiveSlot.slotId;
 
+    console.log('earliestActiveSlot', earliestActiveSlot);
+
     if (!earliestActiveSlotId) {
       return reply(Boom.notAcceptable('Slot is not available'));
     }
@@ -207,7 +209,7 @@ module.exports.placeOrder = {
         }
       });
     } catch (err) {
-      console.log('Place order error', err);
+      console.log('Place order error', err.message);
       return reply(Boom.badRequest(err.message));
     }
 
