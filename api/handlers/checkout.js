@@ -125,7 +125,7 @@ module.exports.reserveSlot = {
     }
 
     try {
-      await selectSlot({
+      const selectSlotResponse = await selectSlot({
         headers: {
           cookie
         },
@@ -136,6 +136,8 @@ module.exports.reserveSlot = {
           storeId: '0000003852'
         }
       });
+
+      console.log('selectSlotResponse', selectSlotResponse.data);
     } catch (err) {
       return reply(Boom.badRequest(err.message));
     }
