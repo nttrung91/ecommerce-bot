@@ -153,6 +153,8 @@ module.exports.reserveSlot = {
       return reply(Boom.badRequest(err.message));
     }
 
+    console.log('Reserve Slot', reserveSlotResponse.data);
+
     const result = Object.assign(
       { slot: normalizeSlot(reserveSlotResponse.data.order) },
       { jsessionid: reserveSlotResponse.data.jsessionid }
@@ -205,6 +207,7 @@ module.exports.placeOrder = {
         }
       });
     } catch (err) {
+      console.log('Place order error', err);
       return reply(Boom.badRequest(err.message));
     }
 
