@@ -38,7 +38,7 @@
     "hapi": "^16.4.3",
     "hapi-auth-jwt2": "^7.3.0",
     "lodash": "^4.17.11",
-    "moment": "^2.24.0",
+    "moment": "^2.29.4",
     "twilio": "^3.31.0"
   },
   "devDependencies": {
